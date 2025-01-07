@@ -1,0 +1,12 @@
+C:\Workspace\CollectiveComments\bin\Release\net9.0\publish\CollectiveComments.exe
+C:\Workspace\CollectiveComments\bin\Release\net9.0\publish\appsettings.Development.json
+C:\Workspace\CollectiveComments\bin\Release\net9.0\publish\appsettings.json
+C:\Workspace\CollectiveComments\bin\Release\net9.0\publish\CollectiveComments.dll
+C:\Workspace\CollectiveComments\bin\Release\net9.0\publish\CollectiveComments.deps.json
+C:\Workspace\CollectiveComments\bin\Release\net9.0\publish\CollectiveComments.runtimeconfig.json
+C:\Workspace\CollectiveComments\bin\Release\net9.0\publish\CollectiveComments.pdb
+C:\Workspace\CollectiveComments\bin\Release\net9.0\publish\Microsoft.AspNetCore.OpenApi.dll
+C:\Workspace\CollectiveComments\bin\Release\net9.0\publish\Microsoft.OpenApi.dll
+C:\Workspace\CollectiveComments\bin\Release\net9.0\publish\Swashbuckle.AspNetCore.Swagger.dll
+C:\Workspace\CollectiveComments\bin\Release\net9.0\publish\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Workspace\CollectiveComments\bin\Release\net9.0\publish\Swashbuckle.AspNetCore.SwaggerUI.dll
