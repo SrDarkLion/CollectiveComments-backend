@@ -5,7 +5,7 @@ namespace CollectiveComments
 {
     public class AppDbCotext : DbContext
     {
-        private DbSet<Company> companies { get; set; }
+        public DbSet<Company> companies { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

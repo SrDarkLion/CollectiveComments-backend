@@ -1,6 +1,7 @@
 using CollectiveComments;
 using CollectiveComments.Migrations;
 using CollectiveComments.Models;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,9 +22,24 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("companies", () =>
-{
-    return new Company();
+app.MapPost("/companies", async (AppDbCotext dbCotext, Company newCompany) => {
+    if (string.IsNullOrWhiteSpace(newCompany.Name) ||
+        string.IsNullOrWhiteSpace(newCompany.Password) ||
+        string.IsNullOrWhiteSpace(newCompany.Code))
+    {
+        return Results.BadRequest("Nome, senha e código são obrigatórios.");
+    }
+
+    var exitingCompany = await dbCotext.companies.FirstOrDefaultAsync(c => c.Code == newCompany.Code);
+
+    if (exitingCompany != null) {
+        return Results.Conflict($"Já existe uma empresa com o código '{newCompany.Code}'.");
+    }
+
+    dbCotext.companies.Add(newCompany);
+    await dbCotext.SaveChangesAsync();
+
+    return Results.Created($"/companies/{newCompany.Id}", newCompany);
 });
 
 app.Run();
