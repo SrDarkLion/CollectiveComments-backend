@@ -21,5 +21,6 @@ namespace CollectiveComments.Models
         public string Code { get; set; }
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        
     }
 }

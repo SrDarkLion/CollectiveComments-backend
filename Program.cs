@@ -1,4 +1,5 @@
 using CollectiveComments;
+using CollectiveComments.Migrations;
 using CollectiveComments.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +23,7 @@ app.UseHttpsRedirection();
 
 app.MapGet("companies", () =>
 {
-    new AppDbCotext();
+    return new Company();
 });
 
 app.Run();

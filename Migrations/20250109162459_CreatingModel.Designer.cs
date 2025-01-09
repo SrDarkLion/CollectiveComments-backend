@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CollectiveComments.Migrations
 {
     [DbContext(typeof(AppDbCotext))]
-    [Migration("20250108202652_Initial")]
-    partial class Initial
+    [Migration("20250109162459_CreatingModel")]
+    partial class CreatingModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,7 +29,8 @@ namespace CollectiveComments.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -38,7 +39,8 @@ namespace CollectiveComments.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Name")
                         .IsRequired()
