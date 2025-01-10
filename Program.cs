@@ -24,11 +24,13 @@ app.UseHttpsRedirection();
 
 app.MapPost("/companies", async (AppDbCotext dbCotext, Company newCompany) => {
     if (string.IsNullOrWhiteSpace(newCompany.Name) ||
-        string.IsNullOrWhiteSpace(newCompany.Password) ||
-        string.IsNullOrWhiteSpace(newCompany.Code))
+        string.IsNullOrWhiteSpace(newCompany.Password))
     {
-        return Results.BadRequest("Nome, senha e código são obrigatórios.");
+        return Results.BadRequest("Nome e senha são obrigatórios.");
     }
+    newCompany.Id = Guid.NewGuid(); // Gera o ID antes
+    var idPrefix = newCompany.Id.ToString().Split('-')[0]; // Pega os primeiros 8 caracteres
+    newCompany.Code = $"{newCompany.Name}-{idPrefix}".ToLower().Replace(" ", "-");
 
     var exitingCompany = await dbCotext.companies.FirstOrDefaultAsync(c => c.Code == newCompany.Code);
 
