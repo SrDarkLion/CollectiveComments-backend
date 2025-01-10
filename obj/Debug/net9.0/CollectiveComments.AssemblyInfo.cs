@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CollectiveComments")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7946151da4a6244895f4441af0d67ebd4ddfd1a0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+df8093cbcd22820a5503284959006fa5140bd851")]
 [assembly: System.Reflection.AssemblyProductAttribute("CollectiveComments")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CollectiveComments")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
