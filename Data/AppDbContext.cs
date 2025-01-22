@@ -11,7 +11,7 @@ namespace CollectiveComments
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql("host=localhost;port=5432;database=postgres;username=postgres;password=money");
+            optionsBuilder.UseNpgsql("host=localhost;port=5432;database=co;username=postgres;password=money");
             base.OnConfiguring(optionsBuilder);
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
