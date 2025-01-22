@@ -6,7 +6,7 @@
 
 - C#
 - PostgreSQL
-- Sweguer
+- Swegger
 
 ## 📃 Estrutura de Pastas do Projeto
 
