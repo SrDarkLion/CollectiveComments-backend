@@ -1,6 +1,6 @@
 # Davi Quinino - Collective Comments
 
-![BANNER](img/capa.png)
+![BANNER](Assets/img/capa.png)
 
 ## 💻 Tecnologias
 
@@ -14,7 +14,7 @@
 │
 ├── Data/
 │   └── AppDbContext.cs
-├── img/
+├── Assets/img/
 │   ├── capa.png
 ├── Migrations
 │   ├── ...
