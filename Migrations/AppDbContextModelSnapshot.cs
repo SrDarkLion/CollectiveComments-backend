@@ -3,7 +3,6 @@ using System;
 using CollectiveComments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,12 +10,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace CollectiveComments.Migrations
 {
-    [DbContext(typeof(AppDbCotext))]
-    [Migration("20250114203141_InitialMigration")]
-    partial class InitialMigration
+    [DbContext(typeof(AppDbContext))]
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,6 +51,12 @@ namespace CollectiveComments.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("companies");
                 });
 
@@ -74,7 +77,8 @@ namespace CollectiveComments.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.HasKey("Id");
 

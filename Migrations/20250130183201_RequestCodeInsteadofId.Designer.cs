@@ -11,9 +11,9 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace CollectiveComments.Migrations
 {
-    [DbContext(typeof(AppDbCotext))]
-    [Migration("20250122172242_ChangeDatabase")]
-    partial class ChangeDatabase
+    [DbContext(typeof(AppDbContext))]
+    [Migration("20250130183201_RequestCodeInsteadofId")]
+    partial class RequestCodeInsteadofId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,6 +54,12 @@ namespace CollectiveComments.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("companies");
                 });
 
@@ -74,7 +80,8 @@ namespace CollectiveComments.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.HasKey("Id");
 

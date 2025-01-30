@@ -11,6 +11,7 @@ namespace CollectiveComments.Models
         public Guid Id { get; set; }
 
         [Required]
+        [StringLength(500)]
         public string Message { get; set; }
 
         [Required]

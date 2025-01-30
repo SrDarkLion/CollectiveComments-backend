@@ -1,5 +1,4 @@
 using CollectiveComments;
-using CollectiveComments.Migrations;
 using CollectiveComments.Models;
 using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
@@ -10,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<AppDbCotext>();
+builder.Services.AddScoped<AppDbContext>();
 
 var app = builder.Build();
 
@@ -23,52 +22,49 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/companies", async (AppDbCotext dbCotext, Company newCompany) => {
+app.MapPost("/companies", async (AppDbContext dbCotext, Company newCompany) => {
     if (string.IsNullOrWhiteSpace(newCompany.Name) ||
         string.IsNullOrWhiteSpace(newCompany.Password))
     {
         return Results.BadRequest("Nome e senha são obrigatórios.");
     }
+
     newCompany.Id = Guid.NewGuid(); // Gera o ID antes
-    var idPrefix = newCompany.Id.ToString().Split('-')[0]; // Pega os primeiros 8 caracteres
-    newCompany.Code = $"{newCompany.Name}-{idPrefix}".ToLower().Replace(" ", "-");
+ 
+    newCompany.GenerateCode();
 
     newCompany.Password = BCrypt.Net.BCrypt.HashPassword(newCompany.Password);
 
-    var exitingCompany = await dbCotext.companies.FirstOrDefaultAsync(c => c.Code == newCompany.Code);
-
-    if (exitingCompany != null) {
-        return Results.Conflict($"Já existe uma empresa com o código '{newCompany.Code}'.");
-    }
-
     dbCotext.companies.Add(newCompany);
+
     await dbCotext.SaveChangesAsync();
 
     return Results.Created($"/companies/{newCompany.Id}", newCompany);
 });
 
-// Rota para enviar um feedback
-app.MapPost("/companies/{companyId}/feedbacks", async (AppDbCotext dbContext, Guid companyId, Feedback feedback) => {
+app.MapPost("/companies/{code}/feedbacks", async (AppDbContext dbContext, string code, Feedback feedback) =>
+{
     // Verifica se a empresa existe
-    var company = await dbContext.companies.FirstOrDefaultAsync(c => c.Id == companyId);
+    var company = await dbContext.companies.FirstOrDefaultAsync(c => c.Code == code);
     if (company == null)
     {
         return Results.NotFound("Empresa não encontrada.");
     }
 
     // Configura o feedback com o ID da empresa
-    feedback.CompanyId = companyId;
+    feedback.CompanyId = company.Id; // Corrigido para associar ao ID correto da empresa
 
     dbContext.feedbacks.Add(feedback);
     await dbContext.SaveChangesAsync();
 
-    return Results.Created($"/companies/{companyId}/feedbacks/{feedback.Id}", feedback);
+    return Results.Created($"/companies/{code}/feedbacks/{feedback.Company.Code}", feedback);
 });
 
 // Rota para listar os feedbacks de uma empresa
-app.MapGet("/companies/{companyId}/feedbacks", async (AppDbCotext dbContext, Guid companyId) => {
+app.MapGet("/companies/{code}/feedbacks", async (AppDbContext dbContext, string code) =>
+{
     // Verifica se a empresa existe
-    var company = await dbContext.companies.FirstOrDefaultAsync(c => c.Id == companyId);
+    var company = await dbContext.companies.FirstOrDefaultAsync(c => c.Code == code);
     if (company == null)
     {
         return Results.NotFound("Empresa não encontrada.");
@@ -76,7 +72,7 @@ app.MapGet("/companies/{companyId}/feedbacks", async (AppDbCotext dbContext, Gui
 
     // Retorna os feedbacks associados à empresa
     var feedbacks = await dbContext.feedbacks
-        .Where(f => f.CompanyId == companyId)
+        .Where(f => f.CompanyId == company.Id) // Corrigido para acessar o ID correto da empresa
         .OrderByDescending(f => f.CreatedAt)
         .ToListAsync();
 
