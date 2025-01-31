@@ -2,6 +2,7 @@ using CollectiveComments;
 using CollectiveComments.Models;
 using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
+using CollectiveComments.DTO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,18 +23,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/companies", async (AppDbContext dbCotext, Company newCompany) => {
-    if (string.IsNullOrWhiteSpace(newCompany.Name) ||
-        string.IsNullOrWhiteSpace(newCompany.Password))
+app.MapPost("/companies", async (AppDbContext dbCotext, CreateCompanyDTO companyDTO) => {
+    if (string.IsNullOrWhiteSpace(companyDTO.Name) ||
+        string.IsNullOrWhiteSpace(companyDTO.Password))
     {
         return Results.BadRequest("Nome e senha são obrigatórios.");
     }
+    var newCompany = new Company
+    {
+        Id = Guid.NewGuid(),
+        Name = companyDTO.Name,
+        Password = BCrypt.Net.BCrypt.HashPassword(companyDTO.Password), // Hash da senha para segurança
+        CreatedAt = DateTime.UtcNow
+    };
 
-    newCompany.Id = Guid.NewGuid(); // Gera o ID antes
- 
     newCompany.GenerateCode();
-
-    newCompany.Password = BCrypt.Net.BCrypt.HashPassword(newCompany.Password);
 
     dbCotext.companies.Add(newCompany);
 

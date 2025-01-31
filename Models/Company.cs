@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace CollectiveComments.Models
 {
     [Table("companies")]
+
     public class Company
     {
         [Key]
@@ -28,7 +29,7 @@ namespace CollectiveComments.Models
         public void GenerateCode()
         {
             string name = Name.Split(' ')[0].ToLower();
-            string id = Guid.NewGuid().ToString().Split('-')[0];
+            string id = Id.ToString().Split('-')[0];
 
             Code = $"{name}_{id}";
         }
