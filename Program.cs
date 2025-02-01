@@ -1,8 +1,11 @@
-using CollectiveComments;
+using FluentValidation;
+using FluentValidation.Results;
+using CollectiveComments.DTO;
 using CollectiveComments.Models;
+using CollectiveComments;
+using CollectiveComments.Validators;
 using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
-using CollectiveComments.DTO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<AppDbContext>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CompanyDTOValidator>();
 
 var app = builder.Build();
 
@@ -23,17 +28,26 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/companies", async (AppDbContext dbCotext, CreateCompanyDTO companyDTO) => {
-    if (string.IsNullOrWhiteSpace(companyDTO.Name) ||
-        string.IsNullOrWhiteSpace(companyDTO.Password))
+app.MapPost("/companies", async (AppDbContext dbCotext, CreateCompanyDTO companyDTO, IValidator<CreateCompanyDTO> validator) =>
+{
+    // Validação do DTO usando FluentValidation
+    ValidationResult validationResult = await validator.ValidateAsync(companyDTO);
+    if (!validationResult.IsValid)
     {
-        return Results.BadRequest("Nome e senha são obrigatórios.");
+        return Results.BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
     }
+
+    // Verifica se a empresa já existe pelo nome
+    if (await dbCotext.companies.AnyAsync(c => c.Name == companyDTO.Name))
+    {
+        return Results.Conflict($"Já existe uma empresa com o nome '{companyDTO.Name}'.");
+    }
+
     var newCompany = new Company
     {
         Id = Guid.NewGuid(),
         Name = companyDTO.Name,
-        Password = BCrypt.Net.BCrypt.HashPassword(companyDTO.Password), // Hash da senha para segurança
+        Password = BCrypt.Net.BCrypt.HashPassword(companyDTO.Password),
         CreatedAt = DateTime.UtcNow
     };
 
@@ -43,7 +57,7 @@ app.MapPost("/companies", async (AppDbContext dbCotext, CreateCompanyDTO company
 
     await dbCotext.SaveChangesAsync();
 
-    return Results.Created($"/companies/{newCompany.Id}", newCompany);
+    return Results.Created($"/companies/{newCompany.Code}", newCompany);
 });
 
 app.MapPost("/companies/{code}/feedbacks", async (AppDbContext dbContext, string code, Feedback feedback) =>
