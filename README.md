@@ -5,6 +5,7 @@
 ## 💻 Tecnologias
 
 - C#
+- .Net
 - PostgreSQL
 - Swagger
 
@@ -15,14 +16,14 @@
 ├── Data/
 │   └── AppDbContext.cs
 ├── Assets/img/
-│   ├── capa.png
+│   └── capa.png
 ├── Migrations
-│   ├── ...
+│   └── ...
 ├── Models/
 │   ├── Company.cs
 |   └── Feedback.cs
 ├── Properts/
-|   ├── ...
+|   └── ...
 ├── ...
 └── Program.cs
 ```
