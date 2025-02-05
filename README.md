@@ -17,6 +17,12 @@
 │   └── AppDbContext.cs
 ├── Assets/img/
 │   └── capa.png
+├── DTO/
+│   ├── CreateCompanyDTO.cs
+|   └── CreateFeedbackDTO.cs
+├── Validator/
+│   ├── CompanyDTOValidator.cs
+|   └── FeedbackDTOValidator.cs
 ├── Migrations
 │   └── ...
 ├── Models/
