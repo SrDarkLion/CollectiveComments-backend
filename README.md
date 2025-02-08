@@ -10,7 +10,6 @@
 - Swagger
 
 ## 📃 Estrutura de Pastas do Projeto
-teste
 ```text
 │
 ├── Data/
