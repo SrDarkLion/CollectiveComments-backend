@@ -6,27 +6,31 @@ export default function CreateCodeForm(){
   const [name, setName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [repassword, setRepassword] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{[key:string]:string}>({});
 
   const formSchema = z.object({
     name: z.string().min(1, { message: 'O nome da empresa é obrigatório.' }),
     password: z.string().min(6, { message: 'A senha deve ter pelo menos 6 caracteres.' }),
     repassword: z.string(),
   }).refine((data) => data.password === data.repassword, {
-    message: 'As senhas não coincidem.',
+    message: 'As senhas estão diferente.',
     path: ['repassword'],
   });
 
   function dataForm(event:FormEvent){
     event.preventDefault();
     const result = formSchema.safeParse({ name, password, repassword });
+    console.log(result.error)
 
-    if (password !== repassword) {
-      setError("As senhas errada.");
+    if (!result.success) {
+      const formattedErrors: { [key: string]: string } = {};
+      result.error.issues.forEach((issue) => {
+        formattedErrors[issue.path[0]] = issue.message;
+      });
+      setErrors(formattedErrors);
       return;
     }
-
-    console.log('ok')
+    setErrors({});
   }
 
   return(
@@ -42,7 +46,9 @@ export default function CreateCodeForm(){
             placeholder=""
             onChange={(e)=> setName(e.target.value)}
           />
+          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
         </div>
+        
       </div>
   
       <div className="flex flex-col gap-2">
@@ -57,6 +63,7 @@ export default function CreateCodeForm(){
             onChange={(e)=> setPassword(e.target.value)}
           />
         </div>
+        {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -71,9 +78,8 @@ export default function CreateCodeForm(){
             onChange={(e)=> setRepassword(e.target.value)}
           />
         </div>
+        {errors.repassword && <p className="text-red-500 text-sm mt-1">{errors.repassword}</p>}
       </div>
-
-      {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <button
         type="submit"
