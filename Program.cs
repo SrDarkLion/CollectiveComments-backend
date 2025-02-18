@@ -37,7 +37,6 @@ app.MapPost("/companies", async (AppDbContext dbCotext, CreateCompanyDTO company
         return Results.BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
     }
 
-    // Verifica se a empresa já existe pelo nome
     if (await dbCotext.companies.AnyAsync(c => c.Name == companyDTO.Name))
     {
         return Results.Conflict($"Já existe uma empresa com o nome '{companyDTO.Name}'.");
@@ -62,15 +61,14 @@ app.MapPost("/companies", async (AppDbContext dbCotext, CreateCompanyDTO company
 
 app.MapPost("/companies/{code}/feedbacks", async (AppDbContext dbContext, string code, Feedback feedback) =>
 {
-    // Verifica se a empresa existe
+
     var company = await dbContext.companies.FirstOrDefaultAsync(c => c.Code == code);
     if (company == null)
     {
         return Results.NotFound("Empresa não encontrada.");
     }
 
-    // Configura o feedback com o ID da empresa
-    feedback.CompanyId = company.Id; // Corrigido para associar ao ID correto da empresa
+    feedback.CompanyId = company.Id;
 
     dbContext.feedbacks.Add(feedback);
     await dbContext.SaveChangesAsync();
@@ -81,16 +79,15 @@ app.MapPost("/companies/{code}/feedbacks", async (AppDbContext dbContext, string
 // Rota para listar os feedbacks de uma empresa
 app.MapGet("/companies/{code}/feedbacks", async (AppDbContext dbContext, string code) =>
 {
-    // Verifica se a empresa existe
+
     var company = await dbContext.companies.FirstOrDefaultAsync(c => c.Code == code);
     if (company == null)
     {
         return Results.NotFound("Empresa não encontrada.");
     }
 
-    // Retorna os feedbacks associados à empresa
     var feedbacks = await dbContext.feedbacks
-        .Where(f => f.CompanyId == company.Id) // Corrigido para acessar o ID correto da empresa
+        .Where(f => f.CompanyId == company.Id)
         .OrderByDescending(f => f.CreatedAt)
         .ToListAsync();
 
