@@ -1,16 +1,13 @@
 using FluentValidation;
-using FluentValidation.Results;
 using CollectiveComments.DTO;
 using CollectiveComments.Models;
 using CollectiveComments;
 using CollectiveComments.Validators;
 using Microsoft.EntityFrameworkCore;
-using BCrypt.Net;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<AppDbContext>();
@@ -19,7 +16,6 @@ builder.Services.AddValidatorsFromAssemblyContaining<CompanyDTOValidator>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -28,18 +24,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/companies", async (AppDbContext dbCotext, CreateCompanyDTO companyDTO, IValidator<CreateCompanyDTO> validator) =>
+app.MapPost("/companies", async (
+    AppDbContext dbCotext,
+    [FromBody] CreateCompanyDTO companyDTO,
+    IValidator<CreateCompanyDTO> validator
+    ) =>
 {
-    // Validação do DTO usando FluentValidation
-    ValidationResult validationResult = await validator.ValidateAsync(companyDTO);
+    var validationResult = await validator.ValidateAsync(companyDTO);
     if (!validationResult.IsValid)
     {
         return Results.BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
     }
 
-    if (await dbCotext.companies.AnyAsync(c => c.Name == companyDTO.Name))
+    if (await dbCotext.Companies.AnyAsync(c => c.Name == companyDTO.Name))
     {
-        return Results.Conflict($"Já existe uma empresa com o nome '{companyDTO.Name}'.");
+        return Results.Conflict($"There is already a company with the name {companyDTO.Name}.");
     }
 
     var newCompany = new Company
@@ -52,42 +51,47 @@ app.MapPost("/companies", async (AppDbContext dbCotext, CreateCompanyDTO company
 
     newCompany.GenerateCode();
 
-    dbCotext.companies.Add(newCompany);
+    dbCotext.Companies.Add(newCompany);
 
     await dbCotext.SaveChangesAsync();
 
     return Results.Created($"/companies/{newCompany.Code}", newCompany);
 });
 
-app.MapPost("/companies/{code}/feedbacks", async (AppDbContext dbContext, string code, Feedback feedback) =>
+app.MapPost("/feedbacks/{code}", async (AppDbContext dbContext, string code, CreateFeedbackDTO feedbackDTO) =>
 {
 
-    var company = await dbContext.companies.FirstOrDefaultAsync(c => c.Code == code);
+    var company = await dbContext.Companies.FirstOrDefaultAsync(c => c.Code == code);
     if (company == null)
     {
-        return Results.NotFound("Empresa não encontrada.");
+        return Results.NotFound("Company Not Found.");
     }
 
-    feedback.CompanyId = company.Id;
+    var newFeedback = new Feedback
+    {
+        Id = Guid.NewGuid(),
+        CompanyCode = code,
+        Message = feedbackDTO.Message,
+        CreatedAt = DateTime.UtcNow
+    };
 
-    dbContext.feedbacks.Add(feedback);
+    dbContext.Feedbacks.Add(newFeedback);
     await dbContext.SaveChangesAsync();
 
-    return Results.Created($"/companies/{code}/feedbacks/{feedback.Company.Code}", feedback);
+    return Results.Created($"/feedback/{code}{feedbackDTO}", feedbackDTO);
 });
 
-// Rota para listar os feedbacks de uma empresa
-app.MapGet("/companies/{code}/feedbacks", async (AppDbContext dbContext, string code) =>
+app.MapGet("/feedbacks/{code}", async (AppDbContext dbContext, string code) =>
 {
 
-    var company = await dbContext.companies.FirstOrDefaultAsync(c => c.Code == code);
+    var company = await dbContext.Companies.FirstOrDefaultAsync(c => c.Code == code);
     if (company == null)
     {
-        return Results.NotFound("Empresa não encontrada.");
+        return Results.NotFound("Company Not Found.");
     }
 
-    var feedbacks = await dbContext.feedbacks
-        .Where(f => f.CompanyId == company.Id)
+    var feedbacks = await dbContext.Feedbacks
+        .Where(f => f.CompanyCode == company.Code)
         .OrderByDescending(f => f.CreatedAt)
         .ToListAsync();
 

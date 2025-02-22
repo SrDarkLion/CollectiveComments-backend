@@ -8,14 +8,14 @@ namespace CollectiveComments.Validators
         public FeedbackDTOValidator()
         {
             RuleFor(f => f.CompanyCode)
-                .NotEmpty().WithMessage("O código da empresa é obrigatório.")
+                .NotEmpty().WithMessage("The company code is mandatory.")
                 .MinimumLength(0)
-                .MaximumLength(40).WithMessage("O código da empresa pode ter no máximo 40 caracteres.");
+                .MaximumLength(40).WithMessage("The company code can have a maximum of 40 characters.");
 
             RuleFor(f => f.Message)
-                .NotEmpty().WithMessage("A mensagem do feedback é obrigatória.")
+                .NotEmpty().WithMessage("The feedback message is mandatory.")
                 .MinimumLength(0)
-                .MaximumLength(600).WithMessage("O feedback pode ter no máximo 600 caracteres.");
+                .MaximumLength(600).WithMessage("Feedback can be a maximum of 600 characters.");
         }
     }
 }

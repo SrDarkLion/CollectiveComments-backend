@@ -8,6 +8,7 @@
 - .Net
 - PostgreSQL
 - Swagger
+- Postman
 
 ## 📃 Estrutura de Pastas do Projeto
 
@@ -28,8 +29,10 @@
 ├── Models/
 │   ├── Company.cs
 |   └── Feedback.cs
-├── Properts/
+├── Properties/
 |   └── ...
+├── src/enum/
+|   └── FeedbackType.cs
 ├── ...
 └── Program.cs
 ```

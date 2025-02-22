@@ -1,11 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace CollectiveComments.Models
 {
     [Table("companies")]
-
+    [Index(nameof(Code), IsUnique = true)]
     public class Company
     {
         [Key]
@@ -23,8 +24,11 @@ namespace CollectiveComments.Models
         [Required]
         [StringLength(80)]
         public string Code { get; set; }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public virtual ICollection<Feedback> Feedbacks { get; set; }
 
         public void GenerateCode()
         {

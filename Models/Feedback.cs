@@ -15,12 +15,16 @@ namespace CollectiveComments.Models
         public string Message { get; set; }
 
         [Required]
-        public Guid CompanyId { get; set; }
-
-        [ForeignKey("CompanyId")]
-        public Company Company { get; set; }
+        public FeedbackType Type { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [Required]
+        [StringLength(80)]
+        public string CompanyCode { get; set; }
+
+        [ForeignKey("CompanyCode")]
+        public virtual Company Company { get; set; }
     }
 }

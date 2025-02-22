@@ -1,16 +1,18 @@
 using System.ComponentModel.DataAnnotations;
-using FluentValidation;
 
 namespace CollectiveComments.DTO
 {
     public class CreateFeedbackDTO
     {
-        [Required(ErrorMessage = "O código da empresa é obrigatório.")]
-        [StringLength(40, MinimumLength = 0, ErrorMessage = "O código da empresa deve ter no máximo 40 caracteres.")]
+        [Required(ErrorMessage = "The company code is mandatory.")]
+        [StringLength(40, MinimumLength = 0, ErrorMessage = "The company code must have a maximum of 40 characters.")]
         public string CompanyCode { get; set; }
 
-        [Required(ErrorMessage = "A mensagem do feedback é obrigatória.")]
-        [StringLength(600, MinimumLength = 0, ErrorMessage = "O feedback deve ter no máximo 600 caracteres.")]
+        [Required(ErrorMessage = "The feedback message is mandatory.")]
+        [StringLength(600, MinimumLength = 0, ErrorMessage = "Feedback must be a maximum of 600 characters.")]
         public string Message { get; set; }
+
+        [Required(ErrorMessage = "Feedback type is mandatory.")]
+        public FeedbackType Type { get; set; }
     }
 }

@@ -5,8 +5,8 @@ namespace CollectiveComments
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<Company> companies { get; set; }
-        public DbSet<Feedback> feedbacks { get; set; }
+        public DbSet<Company> Companies { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -16,9 +16,16 @@ namespace CollectiveComments
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             modelBuilder.Entity<Company>()
-       .HasIndex(c => c.Code)
-       .IsUnique();
+                .HasKey(c => c.Id);
+
+            modelBuilder.Entity<Company>()
+                .HasAlternateKey(c => c.Code);
+
+            modelBuilder.Entity<Company>()
+                .HasIndex(c => c.Code)
+                .IsUnique();
 
             modelBuilder.Entity<Company>()
                 .HasIndex(c => c.Name)
@@ -33,6 +40,9 @@ namespace CollectiveComments
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.Entity<Feedback>()
+                .HasKey(f => f.Id);
+
+            modelBuilder.Entity<Feedback>()
                 .Property(f => f.Id)
                 .HasDefaultValueSql("gen_random_uuid()");
 
@@ -40,12 +50,12 @@ namespace CollectiveComments
                 .Property(f => f.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-            // Correct relationship configuration using Id as foreign key
             modelBuilder.Entity<Feedback>()
                 .HasOne(f => f.Company)
-                .WithMany()
-                .HasForeignKey(f => f.CompanyId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .WithMany(f => f.Feedbacks)
+                .HasForeignKey(f => f.CompanyCode)
+                .HasPrincipalKey(c => c.Code);
+
 
             base.OnModelCreating(modelBuilder);
         }
