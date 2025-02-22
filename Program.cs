@@ -84,14 +84,14 @@ app.MapPost("/feedbacks/{code}", async (AppDbContext dbContext, string code, Cre
 app.MapGet("/feedbacks/{code}", async (AppDbContext dbContext, string code) =>
 {
 
-    var company = await dbContext.Companies.FirstOrDefaultAsync(c => c.Code == code);
-    if (company == null)
+    var feedback = await dbContext.Feedbacks.FirstOrDefaultAsync(c => c.CompanyCode == code);
+    if (feedback == null)
     {
         return Results.NotFound("Company Not Found.");
     }
 
     var feedbacks = await dbContext.Feedbacks
-        .Where(f => f.CompanyCode == company.Code)
+        .Where(f => f.CompanyCode == feedback.CompanyCode)
         .OrderByDescending(f => f.CreatedAt)
         .ToListAsync();
 
